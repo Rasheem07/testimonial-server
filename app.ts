@@ -153,7 +153,7 @@ app.use("/api/otp", require("./routes/otp"));
 app.use(globalErrorHandling);
 
 connectToPostgresDatabase();
-insertAllData(spaceData, thankYouData, extraSettingsData);
+// insertAllData(spaceData, thankYouData, extraSettingsData);
 
 
 // Call the function to insert data
