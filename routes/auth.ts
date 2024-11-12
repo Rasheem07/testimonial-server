@@ -112,7 +112,7 @@ router.get('/status', (req : express.Request, res: express.Response) => {
   const {refreshToken} = req.cookies;
 
   if(!refreshToken) {
-    res.status(401).json({message: "user is unauthorized!"});
+    return res.status(401).json({message: "user is unauthorized!"});
     //redirect to login page in client 
   }
 
