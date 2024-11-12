@@ -16,7 +16,7 @@ passport.use(
     {
       clientID: GOOGLE_OAUTH_CLIENT_ID,
       clientSecret: GOOGLE_OAUTH_SECRET_ID,
-      callbackURL: `${process.env.PROD_BASE_URL}/api/auth/google/callback`,
+      callbackURL: `https://testimonial-server-kiqu.onrender.com/api/auth/google/callback`,
     },
     async function (accessToken, refreshToken, profile, cb) {
       try {
