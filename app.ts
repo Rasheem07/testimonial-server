@@ -21,7 +21,7 @@ const app: Application = express();
 //config the cors
 app.use(
   cors({
-    origin: "testimonial-to-one.vercel.app",
+    origin: "https://testimonial-to-one.vercel.app",
     credentials: true, // Allow cookies to be sent
   }) 
 ); 
