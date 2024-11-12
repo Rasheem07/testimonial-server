@@ -54,7 +54,7 @@ router.get(
         secure: process.env.NODE_ENV === "production", // Secure in production
         expires: refreshTokenExpiration, // Set expiration for refresh token
       });
-      res.redirect(`http://localhost:3000/dashboard`);
+      res.redirect(`https://testimonial-to-one.vercel.app/dashboard`);
     } else {
       res.status(401).json({ message: "Authentication failed" });
     }
@@ -100,7 +100,7 @@ router.get(
         secure: process.env.NODE_ENV === "production", // Secure in production
         expires: refreshTokenExpiration, // Set expiration for refresh token
       });
-      res.redirect(`http://localhost:3000/dashboard`);
+      res.redirect(`https://testimonial-to-one.vercel.app/dashboard`);
     } else {
       res.status(401).json({ message: "Authentication failed" });
     }
