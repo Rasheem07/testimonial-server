@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { password } from "../utils/regex";
+import { password } from "../utils/regex"; 
 
 export const userValidator = Joi.object({
   name: Joi.string().trim().required().messages({

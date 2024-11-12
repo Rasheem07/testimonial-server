@@ -1,16 +1,17 @@
 import express from "express";
-// import { handleLogin } from "../controllers/auth/login";
-import { validateRequest } from "../middlewares/validate";
+import { handleLogin } from "../controllers/auth/login";
+import { validateRequest } from "../middlewares/bodyvalidate";
 import { userValidator } from "../validators/userValidator";
-import { handleRegister } from "../controllers/auth/signup";
-// import { refreshToken } from "../controllers/auth/refreshToken";
+import { handleRegister } from "../controllers/auth/signup"; 
+import { refreshToken } from "../middlewares/refreshToken";
 import passport from "passport";
 import { IUser } from "../types/user";
-const router = express.Router();
+import { storeRefreshToken } from "../utils/tokenOps";
+const router = express.Router(); 
 
 router.post("/register", validateRequest(userValidator), handleRegister);
-// router.post("/login", handleLogin);
-// router.get("/refresh-token", refreshToken);
+router.post("/login", handleLogin);
+router.get("/refresh-token", refreshToken);
 
 router.get(
   "/google",
@@ -19,19 +20,39 @@ router.get(
 
 router.get(
   "/google/callback",
-  passport.authenticate("google", { session: false }), // Disable session if using JWT
-  (req: express.Request, res: express.Response) => {
+  passport.authenticate("google", { session: false, failureRedirect: '/'}), // Disable session if using JWT
+  async (req: express.Request, res: express.Response) => {
     if (req.user) {
       const { user, accessToken, refreshToken } = req.user as any;
 
-      // Set cookies
+      await storeRefreshToken(user, refreshToken);
+
+      // Set cookies for access and refresh tokens
+      const accessTokenExpiration = new Date(Date.now() + 10 * 60 * 1000); // Expires in 10 minutes 
+      const refreshTokenExpiration = new Date(
+        Date.now() + 7 * 24 * 60 * 60 * 1000
+      ); // Expires in 7 days
+
+
+
+      // Set access token cookie
       res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        httpOnly: true, // Prevent JavaScript access
+        domain: "localhost", // Optional: specify only if needed for your environment
+        path: "/",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production", // Secure in production
+        expires: accessTokenExpiration, // Set expiration for access token
       });
+
+      // Set refresh token cookie
       res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        httpOnly: true, // Prevent JavaScript access
+        domain: "localhost", // Optional: specify only if needed for your environment
+        path: "/",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production", // Secure in production
+        expires: refreshTokenExpiration, // Set expiration for refresh token
       });
       res.redirect(`http://localhost:3000/dashboard`);
     } else {
@@ -48,25 +69,54 @@ router.get(
 router.get(
   "/github/callback",
   passport.authenticate("github", { session: false }), // Disable session if using JWT
-  (req: express.Request, res: express.Response) => {
+  async (req: express.Request, res: express.Response) => {
     if (req.user) {
       const { user, accessToken, refreshToken } = req.user as any;
 
-      // Set cookies
+      await storeRefreshToken(user, refreshToken);
+
+      // Set cookies for access and refresh tokens
+      const accessTokenExpiration = new Date(Date.now() + 10 * 60 * 1000); // Expires in 10 minutes
+      const refreshTokenExpiration = new Date(
+        Date.now() + 7 * 24 * 60 * 60 * 1000
+      ); // Expires in 7 days
+
+      // Set access token cookie
       res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-      });
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        httpOnly: true, // Prevent JavaScript access
+        domain: "localhost", // Optional: specify only if needed for your environment
+        path: "/",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production", // Secure in production
+        expires: accessTokenExpiration, // Set expiration for access token
       });
 
+      // Set refresh token cookie
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true, // Prevent JavaScript access
+        domain: "localhost", // Optional: specify only if needed for your environment
+        path: "/",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production", // Secure in production
+        expires: refreshTokenExpiration, // Set expiration for refresh token
+      });
       res.redirect(`http://localhost:3000/dashboard`);
     } else {
       res.status(401).json({ message: "Authentication failed" });
     }
   }
 );
+
+//fetch this onmount in reactjs
+router.get('/status', (req : express.Request, res: express.Response) => {
+  const {refreshToken} = req.cookies;
+
+  if(!refreshToken) {
+    res.status(401).json({message: "user is unauthorized!"});
+    //redirect to login page in client 
+  }
+
+  res.status(200).json({message: "user is authorized to access this content!"})
+})
 
 module.exports = router;

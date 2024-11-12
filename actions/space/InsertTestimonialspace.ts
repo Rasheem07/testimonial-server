@@ -1,24 +1,29 @@
-import { PostgresClient } from "../config/db";
+import { PostgresClient } from "../../lib/db";
 import {
   ExtraSettingsData,
   SpaceData,
-  ThankYouData,
-} from "../types/testimonial";
+  ThankYouData, 
+} from "../../types/testimonial";
+import { uploadImageFile } from "../../uploads/imageUploader";
 
-export const insertAllData = async (
+export const insertTestimonialspaceData= async (
+  userId: string | undefined,
+  file: any,
   spaceData: SpaceData,
   thankYouData: ThankYouData,
   extraSettingsData: ExtraSettingsData
 ) => {
-  const client = await PostgresClient.connect();
+  const dbClient = await PostgresClient.connect();
   try {
-    // Start transaction
-    await client.query("BEGIN");
 
+    // Start transaction
+    await dbClient.query("BEGIN");
+  
     // Step 1: Insert into the space table
     const spaceInsertQuery = `
       INSERT INTO spaces (
-        name,
+        user_id,
+        space_name,
         logo,
         header_title,
         custom_message,
@@ -31,13 +36,16 @@ export const insertAllData = async (
         language
       )
       VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
       ) RETURNING id;
     `;
 
+
+    const logoImage = await uploadImageFile('logos', file);
     const spaceValues = [
-      spaceData.name,
-      spaceData.logo,
+      userId,
+      spaceData.space_name,
+      logoImage,
       spaceData.header_title,
       spaceData.custom_message,
       JSON.stringify(spaceData.questions),
@@ -49,7 +57,7 @@ export const insertAllData = async (
       spaceData.language,
     ];
     
-    const spaceResult = await client.query(spaceInsertQuery, spaceValues);
+    const spaceResult = await dbClient.query(spaceInsertQuery, spaceValues);
     const spaceId = spaceResult.rows[0].id; // Get the generated space ID
 
     // Step 2: Insert into the thank_you_page table
@@ -68,15 +76,15 @@ export const insertAllData = async (
     
     const thankYouValues = [
       spaceId, // Use the generated space ID
-      thankYouData.image,
-      thankYouData.title,
-      thankYouData.message,
-      thankYouData.allow_social,
-      thankYouData.redirect_url,
-      thankYouData.reward_video,
+      thankYouData?.image,
+      thankYouData?.title,
+      thankYouData?.message,
+      thankYouData?.allow_social,
+      thankYouData?.redirect_url,
+      thankYouData?.reward_video,
     ];
     
-    await client.query(thankYouInsertQuery, thankYouValues);
+    await dbClient.query(thankYouInsertQuery, thankYouValues);
 
     // Step 3: Insert into the extra_settings table
     const extraSettingsInsertQuery = `
@@ -102,31 +110,32 @@ export const insertAllData = async (
     
     const extraSettingsValues = [
       spaceId, // Use the generated space ID
-      extraSettingsData.max_duration,
-      extraSettingsData.max_char,
-      extraSettingsData.video_btn_text,
-      extraSettingsData.text_btn_text,
-      extraSettingsData.consent_display,
-      extraSettingsData.consent_statement,
-      extraSettingsData.text_submission_title,
-      extraSettingsData.questions_label,
-      extraSettingsData.default_text_testimonial_avatar,
-      extraSettingsData.affiliate_link,
-      JSON.stringify(extraSettingsData.third_party),
-      extraSettingsData.auto_populate_testimonials_to_the_wall_of_love,
-      extraSettingsData.disable_video_recording_for_iphone_users,
-      extraSettingsData.allow_search_engines_to_index_your_page,
+      extraSettingsData?.max_duration,
+      extraSettingsData?.max_char,
+      extraSettingsData?.video_btn_text,
+      extraSettingsData?.text_btn_text,
+      extraSettingsData?.consent_display,
+      extraSettingsData?.consent_statement,
+      extraSettingsData?.text_submission_title,
+      extraSettingsData?.questions_label,
+      extraSettingsData?.default_text_testimonial_avatar,
+      extraSettingsData?.affiliate_link,
+      JSON.stringify(extraSettingsData?.third_party),
+      extraSettingsData?.auto_populate_testimonials_to_the_wall_of_love,
+      extraSettingsData?.disable_video_recording_for_iphone_users,
+      extraSettingsData?.allow_search_engines_to_index_your_page,
     ];
 
-    await client.query(extraSettingsInsertQuery, extraSettingsValues);
+    await dbClient.query(extraSettingsInsertQuery, extraSettingsValues);
     
     // Commit the transaction if all inserts are successful
-    await client.query("COMMIT");
+    await dbClient.query("COMMIT");
     console.log("All data inserted successfully.");
   } catch (err) {
-    await client.query("ROLLBACK"); // Rollback in case of error
+    await dbClient.query("ROLLBACK"); // Rollback in case of error
     console.error("Error inserting data: ", err);
   } finally {
-    client.release(); // Release the client back to the pool
+    dbClient.release();
+    console.log("successfully inserted!")
   }
 };

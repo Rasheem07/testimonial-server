@@ -1,5 +1,6 @@
 export interface SpaceData {
-    name: string;
+    user: number;
+    space_name: string;
     logo: string;
     header_title: string;
     custom_message: string;

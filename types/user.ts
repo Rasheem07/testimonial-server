@@ -1,6 +1,6 @@
-import { Document } from 'mongoose';
-import { playload } from './playload';
 import { Request } from 'express';
+import { Document } from 'mongoose';
+import { User } from './playload';
 
 export interface IUser extends Document {
   name: string;
@@ -12,8 +12,14 @@ export interface IUser extends Document {
   updated_at: Date;
 }
 
-// Define the extended Request type
+
+
 export interface AuthenticatedRequest extends Request {
-  user?: playload['user']; // Extend with the user property
+  user?: {
+    id?: string; // This must match the User interface
+    // Include other properties if needed
+  }; // Make sure this matches the User interface
 }
+
+
 

@@ -1,4 +1,4 @@
-import { GOOGLE_APP_PASSWORD } from "../config/config";
+import { GOOGLE_APP_PASSWORD } from "../lib/config";
 import nodemailer from "nodemailer";
 
 const sendOTP = async (email: string, otp: number) => {

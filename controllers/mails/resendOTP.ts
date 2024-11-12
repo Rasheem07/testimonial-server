@@ -1,14 +1,15 @@
 import { Request, Response } from "express";
 import { randomInt } from "crypto";
-import sendOTP from "../../services/OTPemail";
+import sendOTP from "../../services/nodemailer";
 import bcrypt from "bcryptjs";
-import { PostgresClient } from "../../config/db";
+import { PostgresClient } from "../../lib/db";
 
 export default async function resendOTP(req: Request, res: Response) {
   const { user } = req.body;
 
   try {
-    const User = await PostgresClient.query(
+    const client = await PostgresClient.connect()
+    const User = await client.query(
       "SELECT * FROM users where email = $1 LIMIT 1",
       [user]
     );
@@ -27,10 +28,12 @@ export default async function resendOTP(req: Request, res: Response) {
     const salt = bcrypt.genSaltSync(10);
     const hashedOTP = bcrypt.hashSync(OTP.toString(), salt);
 
-    await PostgresClient.query("INSERT INTO otps (user, otp) VALUES ($1, $2)", [
+    await client.query("INSERT INTO otps (user, otp) VALUES ($1, $2)", [
       User.rows[0].email,
       hashedOTP,
     ]);
+
+    await client.release();
 
     const sendmail = await sendOTP(user, OTP);
 

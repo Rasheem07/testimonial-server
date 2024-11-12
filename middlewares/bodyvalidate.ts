@@ -4,7 +4,7 @@ import { ObjectSchema } from "joi";
 
 export const validateRequest = (body: ObjectSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const { error } = body.validate(req.body);
+    const { error } = body.validate(req.body, {abortEarly: false});
     if (error) {
       return res
         .status(400)

@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { randomInt } from "crypto";
-import sendOTP from "../../services/OTPemail";
+import sendOTP from "../../services/nodemailer";
 import bcrypt from "bcryptjs";
-import { PostgresClient } from "../../config/db";
+import { PostgresClient } from "../../lib/db";
 
 export default async function handleSendOTP(req: Request, res: Response) {
   const { user } = req.body;
@@ -17,11 +17,15 @@ export default async function handleSendOTP(req: Request, res: Response) {
     const salt = bcrypt.genSaltSync(10);
     const hashedOTP = bcrypt.hashSync(OTP.toString(), salt);
 
+    const client = await PostgresClient.connect()
     // Save the OTP in the database
-    await PostgresClient.query("INSERT INTO otps (user, otp) VALUES ($1, $2)", [
+    await client.query("INSERT INTO otps (user_email, otp) VALUES ($1, $2)", [
       user,
       hashedOTP,
     ]);
+
+    await client.release();
+
 
     // Send the OTP via email
     const sendmail = await sendOTP(user, OTP);
@@ -37,6 +41,6 @@ export default async function handleSendOTP(req: Request, res: Response) {
     console.error(error);
     res
       .status(500)
-      .json({ error: "An error occurred while processing your request" });
+      .json({ error: "An error occurred while processing your request", message: error});
   }
 }

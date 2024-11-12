@@ -1,61 +1,46 @@
-import { PostgresClient } from "../config/db";
-import { createSchema } from "../utils/shema";
-
-// Define the schema for the space table
-const testimonialspaceSchema = `
-   CREATE TABLE IF NOT EXISTS spaces (
-     id SERIAL PRIMARY KEY,
-     name VARCHAR(255) UNIQUE NOT NULL,
-     logo VARCHAR(255) NOT NULL,
-     header_title VARCHAR(255) NOT NULL,
-     custom_message VARCHAR(255) NOT NULL,
-     questions JSONB NOT NULL, 
-     collect_extra JSONB,    
-     collection_type VARCHAR DEFAULT 'text and video',
-     collect_star_ratings BOOL DEFAULT false,
-     allow_custom_btn_color BOOL DEFAULT false,
-     custom_btn_color VARCHAR(8),
-     language VARCHAR(255) DEFAULT 'english'
-   );
+const textTestimonialSchema = `
+CREATE TABLE IF NOT EXISTS text_testimonials (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  spacename VARCHAR(255) NOT NULL REFERENCES spaces(space_name),
+  image_only BOOL DEFAULT false,
+  image_src VARCHAR(1200),
+  ratings INT CHECK (ratings BETWEEN 1 AND 5),  -- Ratings between 1 and 5
+  content VARCHAR(3000),
+  name VARCHAR(255),
+  user_photo VARCHAR(1200),
+  is_liked BOOLEAN DEFAULT true NOT NULL,            -- Indicates if the testimonial is liked
+  is_archived BOOLEAN DEFAULT false,
+  date DATE DEFAULT CURRENT_DATE,  -- Using CURRENT_DATE for date
+  CHECK (image_only = false OR image_src IS NOT NULL),
+  CHECK (image_only = true OR content IS NOT NULL),
+  CHECK (image_only = true OR name IS NOT NULL)
+); 
 `;
 
-const thank_page_info = `
-CREATE TABLE IF NOT EXISTS thank_page (
-    id SERIAL PRIMARY KEY,
-    space_id INTEGER REFERENCES spaces(id),
-    image VARCHAR DEFAULT '/gifs/thankyou.gif',
-    title VARCHAR DEFAULT 'THANK YOU!',
-    message VARCHAR DEFAULT 'Thank you so much for your shoutout! It means a ton for us! 🙏',
-    allow_social BOOL DEFAULT false,
-    redirect_url VARCHAR,
-    reward_video BOOL DEFAULT false
+const videoTestimonialSchema = `
+CREATE TABLE IF NOT EXISTS video_testimonials (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  spacename VARCHAR(255) NOT NULL REFERENCES spaces(space_name),
+  video_url VARCHAR(255) NOT NULL,         
+  thumbnail_url VARCHAR(255),        
+  ratings INT CHECK (ratings BETWEEN 1 AND 5),  -- Ratings between 1 and 5
+  duration FLOAT CHECK (duration < 120),                    
+  is_liked BOOLEAN DEFAULT true,            -- Indicates if the testimonial is liked
+  is_archived BOOLEAN DEFAULT false,         -- Indicates if the testimonial is archived 
+  name VARCHAR(255) NOT NULL,                -- Name of the person giving the testimonial
+  date DATE DEFAULT CURRENT_DATE              -- Date of the testimonial
 );
 `;
 
-const extra_settingsSchema = `
-CREATE TABLE IF NOT EXISTS extra_settings (
-    id SERIAL PRIMARY KEY,
-    space_id INTEGER REFERENCES spaces(id),
-    max_duration INTEGER DEFAULT 120,
-    max_char INTEGER DEFAULT 0,
-    video_btn_text VARCHAR DEFAULT 'Record a video',
-    text_btn_text VARCHAR DEFAULT 'Send in text',
-    consent_display VARCHAR DEFAULT 'required',
-    consent_statement VARCHAR DEFAULT 'I give permission to use this testimonial',
-    text_submission_title VARCHAR DEFAULT 'Title',
-    questions_label VARCHAR DEFAULT 'Questions',
-    default_text_testimonial_avatar VARCHAR,
-    affiliate_link VARCHAR,
-    third_party JSONB,
-    auto_populate_testimonials_to_the_wall_of_love BOOL,
-    disable_video_recording_for_iphone_users BOOL,
-    allow_search_engines_to_index_your_page BOOL
+const socialTestimonialSchema = `
+CREATE TABLE IF NOT EXISTS social_testimonials (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  spacename VARCHAR(255) NOT NULL REFERENCES spaces(space_name),
+  socialId VARCHAR(255) NOT NULL,
+  username VARCHAR(255) NOT NULL,
+  content VARCHAR(255) NOT NULL,
+  social_provider VARCHAR(255) NOT NULL,
+  date DATE DEFAULT CURRENT_DATE              -- Date of the testimonial
 );
-`;
-
-
-export const createSpaceSchema = async () => {
-  await createSchema(testimonialspaceSchema);
-  await createSchema(thank_page_info);
-  await createSchema(extra_settingsSchema);
-};
+`
+export {textTestimonialSchema, videoTestimonialSchema, socialTestimonialSchema};
