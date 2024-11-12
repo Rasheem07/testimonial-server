@@ -20,6 +20,7 @@ export const PostgresClient = new Pool({
   connectionTimeoutMillis: 0,
   min: 0,
   max: 10,
+  keepAlive: true
 });
 
 const setupDatabase = async () => {
