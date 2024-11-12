@@ -23,7 +23,6 @@ app.use(
   cors({
     origin: "http://localhost:3000",
     credentials: true, // Allow cookies to be sent
-    allowedHeaders: ["Content-Type", "access_token", "Authorization", "xsrf-token","X-CSRF-Token"],
   }) 
 ); 
  
