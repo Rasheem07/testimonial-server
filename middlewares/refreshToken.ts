@@ -36,7 +36,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
       // Set cookies for access and refresh tokens 
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
-        domain: "localhost", // Change if needed
+        domain: "testimonial-to-one.vercel.app", // Change if needed
         path: "/",
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production", // Secure in production
@@ -45,7 +45,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
       
       res.cookie("refreshToken", newRefreshToken, {
         httpOnly: true,
-        domain: "localhost", // Change if needed
+        domain: "testimonial-to-one.vercel.app", // Change if needed
         path: "/",
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production", // Secure in production
