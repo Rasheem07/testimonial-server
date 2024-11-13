@@ -54,6 +54,7 @@ router.get(
         secure: true, // Secure in production
         expires: refreshTokenExpiration, // Set expiration for refresh token
       });
+      res.json(accessToken)
       res.redirect(`https://testimonial-to-one.vercel.app/dashboard`);
     } else {
       res.status(401).json({ message: "Authentication failed" });

@@ -1,3 +1,4 @@
+import { File } from "buffer";
 import Joi from "joi";
 
 // Validation schema for text testimonials
@@ -6,7 +7,7 @@ const textTestimonialSchema = Joi.object({
   image_only: Joi.boolean().default(false),  
   image_src: Joi.alternatives()
     .try( 
-      Joi.object().instance(File), // Check for File object
+      Joi.object(), // Check for File object
       Joi.string() // Check for string
     ) 
     .optional(),
@@ -15,7 +16,7 @@ const textTestimonialSchema = Joi.object({
   name: Joi.string().max(255).optional(),
   user_photo: Joi.alternatives()
     .try(
-      Joi.object().instance(File), // Check for File object
+      Joi.object(), // Check for File object
       Joi.string() // Check for string
     )
     .optional(),
@@ -41,7 +42,7 @@ const textTestimonialSchema = Joi.object({
 // Validation schema for video testimonials
 const videoTestimonialSchema = Joi.object({
   space_name: Joi.string().required(), // Ensure space_id is present
-  video: Joi.object().instance(File).messages({
+  video: Joi.object().messages({
     'object.instance': "video must be of file instance",
     'object.base': "video must be passed"
   }),
