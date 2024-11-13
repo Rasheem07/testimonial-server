@@ -40,7 +40,7 @@ router.get(
         httpOnly: true, // Prevent JavaScript access
         domain: "testimonial-to-one.vercel.app", // Optional: specify only if needed for your environment
         path: "/",
-        sameSite: "lax",
+        sameSite: "none",
         secure: process.env.NODE_ENV === "production", // Secure in production
         expires: accessTokenExpiration, // Set expiration for access token
       });
