@@ -41,7 +41,7 @@ router.get(
         domain: "testimonial-to-one.vercel.app", // Optional: specify only if needed for your environment
         path: "/",
         sameSite: "none",
-        secure: process.env.NODE_ENV === "production", // Secure in production
+        secure: true , // Secure in production
         expires: accessTokenExpiration, // Set expiration for access token
       });
 
@@ -50,8 +50,8 @@ router.get(
         httpOnly: true, // Prevent JavaScript access
         domain: "testimonial-to-one.vercel.app", // Optional: specify only if needed for your environment
         path: "/",
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production", // Secure in production
+        sameSite: "none",
+        secure: true, // Secure in production
         expires: refreshTokenExpiration, // Set expiration for refresh token
       });
       res.redirect(`https://testimonial-to-one.vercel.app/dashboard`);
