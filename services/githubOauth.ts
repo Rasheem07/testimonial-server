@@ -12,7 +12,7 @@ passport.use(
     {
       clientID: GITHUB_CLIENT_ID,
       clientSecret: GITHUB_CLIENT_SECRET,
-      callbackURL: `https://testimonial-server-kiqu.onrender.com/api/auth/github/callback`,
+      callbackURL: `https://testimonial-server.up.railway.app/api/auth/github/callback`,
       scope: ["user:email"], // Request email scope
     },
     async function (accessToken, refreshToken, profile, cb) {

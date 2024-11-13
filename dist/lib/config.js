@@ -1,0 +1,28 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.supabase_key = exports.supabase_url = exports.GITHUB_CLIENT_SECRET = exports.GITHUB_CLIENT_ID = exports.GOOGLE_OAUTH_SECRET_ID = exports.GOOGLE_OAUTH_CLIENT_ID = exports.GOOGLE_APP_PASSWORD = exports.JWT_REFRESH_TOKEN = exports.JWT_ACCESS_TOKEN = exports.mongoURI = void 0;
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+const mongoURI = process.env.MONGO_URI;
+exports.mongoURI = mongoURI;
+const JWT_ACCESS_TOKEN = process.env.JWT_ACCESS_TOKEN;
+exports.JWT_ACCESS_TOKEN = JWT_ACCESS_TOKEN;
+const JWT_REFRESH_TOKEN = process.env.JWT_REFRESH_TOKEN;
+exports.JWT_REFRESH_TOKEN = JWT_REFRESH_TOKEN;
+const GOOGLE_APP_PASSWORD = process.env.GOOGLE_APP_PASSWORD;
+exports.GOOGLE_APP_PASSWORD = GOOGLE_APP_PASSWORD;
+const GOOGLE_OAUTH_CLIENT_ID = process.env.GOOGLE_OAUTH_CLIENT_ID;
+exports.GOOGLE_OAUTH_CLIENT_ID = GOOGLE_OAUTH_CLIENT_ID;
+const GOOGLE_OAUTH_SECRET_ID = process.env.GOOGLE_OAUTH_SECRET_ID;
+exports.GOOGLE_OAUTH_SECRET_ID = GOOGLE_OAUTH_SECRET_ID;
+const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+exports.GITHUB_CLIENT_SECRET = GITHUB_CLIENT_SECRET;
+const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+exports.GITHUB_CLIENT_ID = GITHUB_CLIENT_ID;
+const supabase_url = process.env.SUPABASE_URL;
+exports.supabase_url = supabase_url;
+const supabase_key = process.env.SUPABASE_API_KEY;
+exports.supabase_key = supabase_key;
